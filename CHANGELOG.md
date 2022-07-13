@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/compare/v1.13.0...v1.14.0) (2022-07-13)
+
+
+### Features
+
+* VIC-745 Admin console | Add/edit demographics per agency ([a4b9b52](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/a4b9b524a26e8f9629f10166dfb15f55dff6bd0b))
+* VIC-745 Admin console | Add/edit demographics per agency ([a24a377](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/a24a377a198ab82db804a2fe3dabe3ec9236c050))
+* VIC-745 Admin console | Add/edit demographics per agency ([59cbaf7](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/59cbaf732560e2a903437171b0dbe702eac82be6))
+
+
+### Bug Fixes
+
+* orphan removal issue for agency topics ([e85755e](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/e85755ee023e5a0ab8f386422737d37d8626421f))
+* removed caching for DTOs containig changeable feature toggle ([7f5e9ff](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/7f5e9ff03e167c5a02b3bec3b87303095fe09d63))
+* removed caching for DTOs containig changeable feature toggle ([7474dd5](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/7474dd5899d17abf460f2d23991c826d404606a3))
+* VIC-665 Registration | Basic registration with a main topic (and no PLZ) ([4ae5092](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/4ae509226edc8e8b592c52a0c2f1d9d0273166b7))
+* VIC-745 Admin console | Add/edit demographics per agency ([e06c6aa](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/e06c6aa3df66d83d25746637f39170c0f57ea6ec))
+* VIC-745 Admin console | Remove assertions for object count in test to avoid conflicts in forks ([d55b709](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/commit/d55b7093a7e722468943bd36c90b314e236f6a44))
+
 ## [1.13.0](https://github.com/CaritasDeutschland/caritas-onlineBeratung-agencyService/compare/v1.10.0...v1.13.0) (2022-07-11)
 
 
