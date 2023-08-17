@@ -522,12 +522,6 @@ components:
         deleteDate:
           type: string
           example: "2020-09-02T15:53:23"
-        counsellingRelations:
-          type: array
-          items:
-            type: string
-            enum: [ RELATIVE_COUNSELLING, SELF_COUNSELLING, PARENTAL_COUNSELLING ]
-
 
     PostcodeRangeDTO:
       type: object
@@ -625,11 +619,7 @@ components:
           type: integer
           format: int64
           example: 12
-        counsellingRelations:
-          type: array
-          items:
-            type: string
-            enum: [ RELATIVE_COUNSELLING, SELF_COUNSELLING, PARENTAL_COUNSELLING]
+
 
     AgencyAdminFullResponseDTO:
       type: object
@@ -692,11 +682,6 @@ components:
             type: long
         demographics:
           $ref: '#/components/schemas/DemographicsDTO'
-        counsellingRelations:
-          type: array
-          items:
-            type: string
-            enum: [ RELATIVE_COUNSELLING, SELF_COUNSELLING, PARENTAL_COUNSELLING ]
 
     DemographicsDTO:
       type: object
