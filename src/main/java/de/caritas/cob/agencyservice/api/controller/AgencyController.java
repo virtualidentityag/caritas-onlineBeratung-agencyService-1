@@ -41,12 +41,11 @@ public class AgencyController implements AgenciesApi {
       @RequestParam String postcode, @RequestParam Integer consultingType,
       @RequestParam(value = "topicId", required = false) Integer topicId,
       @RequestParam(value = "age", required = false) Integer age,
-      @RequestParam(value = "gender", required = false) String gender,
-      @RequestParam(value = "counsellingRelation", required = false) String counsellingRelation
+      @RequestParam(value = "gender", required = false) String gender
   ) {
 
     var agencies = agencyService.getAgencies(postcode, consultingType,
-        ofNullable(topicId), ofNullable(age), ofNullable(gender), ofNullable(counsellingRelation));
+        ofNullable(topicId), ofNullable(age), ofNullable(gender));
 
     return !CollectionUtils.isEmpty(agencies)
         ? new ResponseEntity<>(agencies, HttpStatus.OK)
