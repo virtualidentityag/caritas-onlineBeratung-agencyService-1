@@ -11,11 +11,10 @@ import de.caritas.cob.agencyservice.api.exception.httpresponses.InvalidDemograph
 import de.caritas.cob.agencyservice.api.exception.httpresponses.InvalidDioceseException;
 import de.caritas.cob.agencyservice.api.exception.httpresponses.InvalidOfflineStatusException;
 import de.caritas.cob.agencyservice.api.exception.httpresponses.InvalidPostcodeException;
-import de.caritas.cob.agencyservice.api.exception.httpresponses.LockedConsultingTypeException;
 import de.caritas.cob.agencyservice.api.exception.httpresponses.NotFoundException;
 import de.caritas.cob.agencyservice.api.service.LogService;
 import java.net.UnknownHostException;
-import javax.validation.ConstraintViolationException;
+import jakarta.validation.ConstraintViolationException;
 import lombok.NoArgsConstructor;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -72,48 +71,6 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
     LogService.logWarning(ex);
 
     return handleExceptionInternal(ex, null, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
-  }
-
-  /**
-   * Incoming request body could not be deserialized.
-   *
-   * @param ex      the thrown exception
-   * @param headers http headers
-   * @param status  http status
-   * @param request web request
-   * @return response entity
-   */
-  @NonNull
-  @Override
-  protected ResponseEntity<Object> handleHttpMessageNotReadable(
-      final @NonNull HttpMessageNotReadableException ex,
-      final @NonNull HttpHeaders headers,
-      final @NonNull HttpStatus status,
-      final @NonNull WebRequest request) {
-    LogService.logWarning(status, ex);
-
-    return handleExceptionInternal(ex, null, headers, status, request);
-  }
-
-  /**
-   * Valid on object fails validation.
-   *
-   * @param ex      the thrown exception
-   * @param headers http headers
-   * @param status  http status
-   * @param request web request
-   * @return response entity
-   */
-  @NonNull
-  @Override
-  protected ResponseEntity<Object> handleMethodArgumentNotValid(
-      final @NonNull MethodArgumentNotValidException ex,
-      final @NonNull HttpHeaders headers,
-      final @NonNull HttpStatus status,
-      final @NonNull WebRequest request) {
-    LogService.logWarning(status, ex);
-
-    return handleExceptionInternal(ex, null, headers, status, request);
   }
 
   /**
@@ -223,25 +180,6 @@ public class ApiResponseEntityExceptionHandler extends ResponseEntityExceptionHa
         null,
         new CustomHttpHeader(ex.getHttpStatusExceptionReason()).buildHeader(),
         HttpStatus.CONFLICT,
-        request);
-  }
-
-  /**
-   * 423 - Locked.
-   *
-   * @param ex      {@link LockedConsultingTypeException}
-   * @param request WebRequest
-   * @return a ResponseEntity instance
-   */
-  @ExceptionHandler({LockedConsultingTypeException.class})
-  public ResponseEntity<Object> handleInternal(
-      final LockedConsultingTypeException ex, final WebRequest request) {
-
-    return handleExceptionInternal(
-        ex,
-        null,
-        new CustomHttpHeader(ex.getHttpStatusExceptionReason()).buildHeader(),
-        HttpStatus.LOCKED,
         request);
   }
 
