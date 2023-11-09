@@ -314,7 +314,8 @@ public class AgencyService {
     RestrictedTenantDTO tenantDataHoldingFeatureToggles = getTenantDataRelevantForFeatureToggles(
         agency);
     Settings settings = tenantDataHoldingFeatureToggles != null ? tenantDataHoldingFeatureToggles.getSettings() : null;
-    if (settings != null && settings.getFeatureCentralDataProtectionTemplateEnabled()) {
+    if (settings != null && settings.getFeatureCentralDataProtectionTemplateEnabled() != null
+        && settings.getFeatureCentralDataProtectionTemplateEnabled()) {
       return centralDataProtectionTemplateService.renderPrivacyTemplateWithRenderedPlaceholderValues(
           agency);
     } else {
