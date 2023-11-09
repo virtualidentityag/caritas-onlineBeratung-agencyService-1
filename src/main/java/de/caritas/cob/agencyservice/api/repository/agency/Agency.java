@@ -3,6 +3,7 @@ package de.caritas.cob.agencyservice.api.repository.agency;
 import de.caritas.cob.agencyservice.api.repository.TenantAware;
 import de.caritas.cob.agencyservice.api.repository.agencypostcoderange.AgencyPostcodeRange;
 import de.caritas.cob.agencyservice.api.repository.agencytopic.AgencyTopic;
+import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import java.util.List;
 import jakarta.persistence.Convert;
@@ -45,19 +46,6 @@ import org.hibernate.type.NumericBooleanConverter;
     name = "tenantFilter",
     parameters = {@ParamDef(name = "tenantId", type = Long.class)})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
-//@AnalyzerDef(
-//    name = Agency.SEARCH_ANALYZER,
-//    tokenizer = @TokenizerDef(factory = StandardTokenizerFactory.class),
-//    filters = {
-//      @TokenFilterDef(factory = ASCIIFoldingFilterFactory.class),
-//      @TokenFilterDef(factory = LowerCaseFilterFactory.class),
-//      @TokenFilterDef(
-//          factory = EdgeNGramFilterFactory.class,
-//          params = {
-//            @Parameter(name = "minGramSize", value = "1"),
-//            @Parameter(name = "maxGramSize", value = "35")
-//          })
-//    })
 public class Agency implements TenantAware {
 
   public static final String SEARCH_ANALYZER = "keyword";
@@ -67,10 +55,6 @@ public class Agency implements TenantAware {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "id_seq")
   @Column(name = "id", updatable = false, nullable = false)
   private Long id;
-
-  @Column(name = "diocese_id", nullable = false)
-  //@FieldBridge(impl = LongBridge.class)
-  private Long dioceseId;
 
   @NonNull
   @Size(max = 100)
@@ -134,6 +118,22 @@ public class Agency implements TenantAware {
 
   @Column(name = "update_date", nullable = false)
   private LocalDateTime updateDate;
+
+  @Column(name = "data_protection_responsible_entity", nullable = false)
+  @Enumerated
+  private DataProtectionResponsibleEntity dataProtectionResponsibleEntity;
+
+
+  @Column(name = "data_protection_officer_contact", nullable = false)
+  private String dataProtectionOfficerContactData;
+
+  @Column(name = "data_protection_alternative_contact", nullable = false)
+  private String dataProtectionAlternativeContactData;
+
+  @Column(name = "data_protection_agency_contact", nullable = false)
+  private String dataProtectionAgencyResponsibleContactData;
+
+
 
   @OneToMany(targetEntity = AgencyPostcodeRange.class, mappedBy = "agency", fetch = FetchType.LAZY)
   private List<AgencyPostcodeRange> agencyPostcodeRanges;

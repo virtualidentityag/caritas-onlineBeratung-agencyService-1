@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import de.caritas.cob.agencyservice.api.helper.AuthenticatedUser;
+import de.caritas.cob.agencyservice.api.util.AuthenticatedUser;
 import de.caritas.cob.agencyservice.api.manager.consultingtype.ConsultingTypeManager;
 import de.caritas.cob.agencyservice.api.model.AgencyDTO;
 import de.caritas.cob.agencyservice.api.model.DemographicsDTO;
@@ -20,7 +20,7 @@ import de.caritas.cob.agencyservice.api.model.UpdateAgencyDTO;
 import de.caritas.cob.agencyservice.api.repository.agency.Gender;
 import de.caritas.cob.agencyservice.api.tenant.TenantContext;
 import de.caritas.cob.agencyservice.consultingtypeservice.generated.web.model.ExtendedConsultingTypeResponseDTO;
-import de.caritas.cob.agencyservice.testHelper.JsonConverter;
+import de.caritas.cob.agencyservice.api.util.JsonConverter;
 import de.caritas.cob.agencyservice.testHelper.PathConstants;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -88,7 +88,6 @@ class AgencyAdminControllerWithDemographicsIT {
         .thenReturn(new ExtendedConsultingTypeResponseDTO());
 
     AgencyDTO agencyDTO = new AgencyDTO()
-        .dioceseId(0L)
         .name("Test name")
         .description("Test description")
         .teamAgency(true)
@@ -96,7 +95,7 @@ class AgencyAdminControllerWithDemographicsIT {
         .external(true)
         .demographics(new DemographicsDTO().ageFrom(10).ageTo(20)
             .genders(List.of(Gender.MALE.name(), Gender.FEMALE.name(), Gender.DIVERSE.name())));
-    String payload = JsonConverter.convert(agencyDTO);
+    String payload = JsonConverter.convertToJson(agencyDTO);
 
     // when, then
     mockMvc.perform(post(PathConstants.CREATE_AGENCY_PATH)
@@ -121,14 +120,13 @@ class AgencyAdminControllerWithDemographicsIT {
         .thenReturn(extendedConsultingTypeResponseDTO);
 
     UpdateAgencyDTO agencyDTO = new UpdateAgencyDTO()
-        .dioceseId(0L)
         .name("Test update name")
         .description("Test update description")
         .external(true)
         .offline(true)
         .demographics(new DemographicsDTO().ageFrom(11).ageTo(21)
             .genders(List.of(Gender.NOT_PROVIDED.name())));
-    String payload = JsonConverter.convert(agencyDTO);
+    String payload = JsonConverter.convertToJson(agencyDTO);
 
     // when, then
     mockMvc.perform(put(PathConstants.UPDATE_DELETE_AGENCY_PATH)
@@ -153,13 +151,12 @@ class AgencyAdminControllerWithDemographicsIT {
         .thenReturn(extendedConsultingTypeResponseDTO);
 
     UpdateAgencyDTO agencyDTO = new UpdateAgencyDTO()
-        .dioceseId(0L)
         .name("Test update name")
         .description("Test update description")
         .external(true)
         .offline(true)
         .demographics(new DemographicsDTO());
-    String payload = JsonConverter.convert(agencyDTO);
+    String payload = JsonConverter.convertToJson(agencyDTO);
 
     // when, then
     mockMvc.perform(put(PathConstants.UPDATE_DELETE_AGENCY_PATH)
