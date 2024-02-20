@@ -307,15 +307,16 @@ public class AgencyService {
         .offline(agency.isOffline())
         .tenantId(agency.getTenantId())
         .consultingType(agency.getConsultingTypeId())
-        .agencySpecificPrivacy(renderedAgencySpecificPrivacy);
+        .agencySpecificPrivacy(renderedAgencySpecificPrivacy)
+        .topicIds(agency.getAgencyTopics().stream().map(AgencyTopic::getTopicId).toList())
+        .agencyLogo(agency.getAgencyLogo());
   }
 
   protected String getRenderedAgencySpecificPrivacy(Agency agency) {
     RestrictedTenantDTO tenantDataHoldingFeatureToggles = getTenantDataRelevantForFeatureToggles(
         agency);
     Settings settings = tenantDataHoldingFeatureToggles != null ? tenantDataHoldingFeatureToggles.getSettings() : null;
-    if (settings != null && settings.getFeatureCentralDataProtectionTemplateEnabled() != null
-        && settings.getFeatureCentralDataProtectionTemplateEnabled()) {
+    if (settings != null && settings.getFeatureCentralDataProtectionTemplateEnabled() != null && Boolean.TRUE.equals(settings.getFeatureCentralDataProtectionTemplateEnabled())) {
       return centralDataProtectionTemplateService.renderPrivacyTemplateWithRenderedPlaceholderValues(
           agency);
     } else {
@@ -337,7 +338,10 @@ public class AgencyService {
         .url(agency.getUrl())
         .external(agency.isExternal())
         .demographics(getDemographics(agency))
-        .tenantId(agency.getTenantId());
+        .tenantId(agency.getTenantId())
+        .topicIds(agency.getAgencyTopics().stream().map(AgencyTopic::getTopicId).toList())
+        .agencyLogo(agency.getAgencyLogo());
+
   }
 
   private DemographicsDTO getDemographics(Agency agency) {

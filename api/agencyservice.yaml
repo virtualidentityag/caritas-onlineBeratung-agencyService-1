@@ -175,6 +175,13 @@ components:
         agencySpecificPrivacy:
           type: string
           example: "specific for agency privacy text"
+        topicIds:
+          type: array
+          items:
+            type: long
+        agencyLogo:
+          type: string
+          example: "base64 encoded image"
 
     FullAgencyResponseDTO:
       type: object

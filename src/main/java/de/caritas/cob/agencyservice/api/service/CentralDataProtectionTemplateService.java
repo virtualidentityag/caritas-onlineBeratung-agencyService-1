@@ -14,6 +14,8 @@ import javax.annotation.Nullable;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import de.caritas.cob.agencyservice.tenantservice.generated.web.model.RestrictedTenantDTO;
 
@@ -26,19 +28,37 @@ public class CentralDataProtectionTemplateService {
 
   private final @NonNull TemplateRenderer templateRenderer;
 
+  private final @NonNull ApplicationSettingsService applicationSettingsService;
+
+  @Value("${feature.multitenancy.with.single.domain.enabled}")
+  private boolean multitenancyWithSingleDomain;
+
+  private boolean isTenantLevelLegalContentOverrideAllowed() {
+    de.caritas.cob.agencyservice.applicationsettingsservice.generated.web.model.ApplicationSettingsDTOMultitenancyWithSingleDomainEnabled
+        legalContentChangesBySingleTenantAdminsAllowed =
+        applicationSettingsService
+            .getApplicationSettings()
+            .getLegalContentChangesBySingleTenantAdminsAllowed();
+    return legalContentChangesBySingleTenantAdminsAllowed != null
+        && Boolean.TRUE.equals(legalContentChangesBySingleTenantAdminsAllowed.getValue());
+  }
+
   public String renderPrivacyTemplateWithRenderedPlaceholderValues(Agency agency) {
-    RestrictedTenantDTO restrictedTenantDataByTenantId = tenantService.getRestrictedTenantDataByTenantId(
-        agency.getTenantId());
-    if (restrictedTenantDataByTenantId != null && restrictedTenantDataByTenantId.getContent() != null) {
-      return renderPrivacyTemplateWithRenderedPlaceholderValues(agency, restrictedTenantDataByTenantId);
+    RestrictedTenantDTO restrictedTenantDataByTenantId = retrieveProperTenant(agency);
+    if (restrictedTenantDataByTenantId != null
+        && restrictedTenantDataByTenantId.getContent() != null) {
+      return renderPrivacyTemplateWithRenderedPlaceholderValues(agency,
+          restrictedTenantDataByTenantId);
     }
     log.debug("No privacy content set for tenant with id: {}", agency.getTenantId());
     return null;
   }
 
   @Nullable
-  private String renderPrivacyTemplateWithRenderedPlaceholderValues(Agency agency, RestrictedTenantDTO restrictedTenantDataByTenantId) {
-    var renderedPlaceholdersMap = renderDataProtectionPlaceholdersFromTemplates(agency);
+  private String renderPrivacyTemplateWithRenderedPlaceholderValues(Agency agency,
+      RestrictedTenantDTO restrictedTenantDataByTenantId) {
+    var renderedPlaceholdersMap = renderDataProtectionPlaceholdersFromTemplates(agency,
+        restrictedTenantDataByTenantId);
     Map<String, Object> dataModel = renderedPlaceholdersMap.entrySet().stream()
         .collect(Collectors.toMap(entry -> entry.getKey().getPlaceholderVariable(),
             Entry::getValue));
@@ -52,22 +72,44 @@ public class CentralDataProtectionTemplateService {
     }
   }
 
-  protected Map<DataProtectionPlaceHolderType, String> renderDataProtectionPlaceholdersFromTemplates(
+  private de.caritas.cob.agencyservice.tenantservice.generated.web.model.RestrictedTenantDTO retrieveProperTenant(
       Agency agency) {
-    RestrictedTenantDTO restrictedTenantDataByTenantId = tenantService.getRestrictedTenantDataByTenantId(
-        agency.getTenantId());
+    if (multitenancyWithSingleDomain) {
+      return getAgencyTenantOrFallbackToMainTenantIfTenantPrivacyOverrideNotAllowed(agency);
+    } else {
+      return tenantService.getRestrictedTenantDataByTenantId(agency.getTenantId());
+    }
+  }
+
+  private de.caritas.cob.agencyservice.tenantservice.generated.web.model.RestrictedTenantDTO getAgencyTenantOrFallbackToMainTenantIfTenantPrivacyOverrideNotAllowed(
+      Agency agency) {
+    if (isTenantLevelLegalContentOverrideAllowed()) {
+      return tenantService.getRestrictedTenantDataByTenantId(agency.getTenantId());
+    } else {
+      return tenantService.getMainTenant();
+    }
+  }
+
+  protected Map<DataProtectionPlaceHolderType, String> renderDataProtectionPlaceholdersFromTemplates(
+      Agency agency, RestrictedTenantDTO restrictedTenantDataByTenantId) {
 
     Map<DataProtectionPlaceHolderType, String> result = Maps.newHashMap();
     if (restrictedTenantDataByTenantId.getContent() != null
         && restrictedTenantDataByTenantId.getContent().getDataProtectionContactTemplate() != null) {
       var renderedDataProtectionOfficerContact = renderDataProtectionOfficerContactFromTemplate(
           agency, restrictedTenantDataByTenantId.getContent().getDataProtectionContactTemplate());
+
       result.put(DataProtectionPlaceHolderType.DATA_PROTECTION_OFFICER,
-          renderedDataProtectionOfficerContact);
+          renderedDataProtectionOfficerContact != null ? renderedDataProtectionOfficerContact
+              : StringUtils.EMPTY);
+
       var renderedDataProtectionResponsible = renderDataProtectionResponsibleFromTemplate(
           agency, restrictedTenantDataByTenantId.getContent().getDataProtectionContactTemplate());
+
       result.put(DataProtectionPlaceHolderType.DATA_PROTECTION_RESPONSIBLE,
-          renderedDataProtectionResponsible);
+          renderedDataProtectionResponsible != null ? renderedDataProtectionResponsible
+              : StringUtils.EMPTY);
+
     }
     return result;
   }
@@ -76,7 +118,8 @@ public class CentralDataProtectionTemplateService {
   private String renderDataProtectionResponsibleFromTemplate(Agency agency,
       DataProtectionContactTemplateDTO dataProtectionContactTemplateDTO) {
     if (isDataProtectionResponsibleTemplateAvailable(dataProtectionContactTemplateDTO)) {
-      return renderDataProtectionResponsibleFromTemplateIfAvailable(agency, dataProtectionContactTemplateDTO);
+      return renderDataProtectionResponsibleFromTemplateIfAvailable(agency,
+          dataProtectionContactTemplateDTO);
     } else {
       log.warn("No data protection responsible template set for tenant with id: {}",
           agency.getTenantId());
@@ -96,7 +139,8 @@ public class CentralDataProtectionTemplateService {
   private String renderDataProtectionOfficerContactFromTemplate(Agency agency,
       DataProtectionContactTemplateDTO dataProtectionContactTemplateDTO) {
     if (isDataProtectionOfficerTemplateAvailable(dataProtectionContactTemplateDTO)) {
-      return renderDataProtectionOfficerContactFromTemplateIfAvailable(agency, dataProtectionContactTemplateDTO);
+      return renderDataProtectionOfficerContactFromTemplateIfAvailable(agency,
+          dataProtectionContactTemplateDTO);
     } else {
       log.warn("No data protection officer template set for tenant with id: {}",
           agency.getTenantId());
@@ -109,6 +153,14 @@ public class CentralDataProtectionTemplateService {
       DataProtectionContactTemplateDTO dataProtectionContactTemplateDTO) {
     final DataProtectionOfficerDTO dataProtectionOfficerDTO = dataProtectionContactTemplateDTO.getAgencyContext()
         .getDataProtectionOfficer();
+
+    if (agency.getDataProtectionResponsibleEntity() == null) {
+      log.warn("No data protection responsible entity set for agency with id: {}",
+          agency.getId());
+      log.warn("Returning null for data protection officer contact template");
+      return null;
+    }
+
     switch (agency.getDataProtectionResponsibleEntity()) {
       case DATA_PROTECTION_OFFICER -> {
         var contactDataDTO = JsonConverter.convertFromJsonNullSafe(
@@ -129,11 +181,8 @@ public class CentralDataProtectionTemplateService {
         return renderDataProtectionContactTemplate(
             dataProtectionOfficerDTO.getAgencyResponsibleContact(), agencyContact);
       }
-      default -> {
-        log.error("No data protection responsible entity set for agency with id: {}",
-            agency.getId());
-        return null;
-      }
+      default -> throw new IllegalArgumentException("Unknown data protection responsible entity: "
+          + agency.getDataProtectionResponsibleEntity());
     }
   }
 
@@ -149,7 +198,8 @@ public class CentralDataProtectionTemplateService {
         && dataProtectionContactTemplateDTO.getAgencyContext().getDataProtectionOfficer() != null;
   }
 
-  private boolean isDataProtectionAgencyContextAvailable(DataProtectionContactTemplateDTO dataProtectionContactTemplateDTO) {
+  private boolean isDataProtectionAgencyContextAvailable(
+      DataProtectionContactTemplateDTO dataProtectionContactTemplateDTO) {
     return dataProtectionContactTemplateDTO != null
         && dataProtectionContactTemplateDTO.getAgencyContext() != null;
   }

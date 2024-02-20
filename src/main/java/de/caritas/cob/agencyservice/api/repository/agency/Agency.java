@@ -3,6 +3,7 @@ package de.caritas.cob.agencyservice.api.repository.agency;
 import de.caritas.cob.agencyservice.api.repository.TenantAware;
 import de.caritas.cob.agencyservice.api.repository.agencypostcoderange.AgencyPostcodeRange;
 import de.caritas.cob.agencyservice.api.repository.agencytopic.AgencyTopic;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -120,7 +121,7 @@ public class Agency implements TenantAware {
   private LocalDateTime updateDate;
 
   @Column(name = "data_protection_responsible_entity", nullable = false)
-  @Enumerated
+  @Enumerated(EnumType.STRING)
   private DataProtectionResponsibleEntity dataProtectionResponsibleEntity;
 
 
@@ -151,6 +152,9 @@ public class Agency implements TenantAware {
 
   @Column(name = "counselling_relations")
   private String counsellingRelations;
+
+  @Column(name = "agency_logo")
+  private String agencyLogo;
 
   @Transient
   public boolean hasAnyDemographicsAttributes() {

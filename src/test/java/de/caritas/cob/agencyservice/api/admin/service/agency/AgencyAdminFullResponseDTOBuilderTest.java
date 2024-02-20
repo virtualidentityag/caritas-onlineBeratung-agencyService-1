@@ -32,6 +32,7 @@ class AgencyAdminFullResponseDTOBuilderTest {
     this.agency.setDataProtectionResponsibleEntity(DataProtectionResponsibleEntity.AGENCY_RESPONSIBLE);
     this.agency.setDataProtectionAgencyResponsibleContactData(JsonConverter.convertToJson(new DataProtectionContactDTO()));
     this.agency.setDataProtectionOfficerContactData(JsonConverter.convertToJson(new DataProtectionContactDTO()));
+    this.agency.setDataProtectionAlternativeContactData(JsonConverter.convertToJson(new DataProtectionContactDTO()));
     this.agency.setTenantId(TENANT_ID);
     this.agencyAdminFullResponseDTOBuilder = new AgencyAdminFullResponseDTOBuilder(agency);
     this.agency.setCounsellingRelations(AgencyDTO.CounsellingRelationsEnum.PARENTAL_COUNSELLING.getValue() + "," + AgencyDTO.CounsellingRelationsEnum.RELATIVE_COUNSELLING.getValue());
@@ -56,6 +57,7 @@ class AgencyAdminFullResponseDTOBuilderTest {
     assertEquals(agency.getUrl(), result.getEmbedded().getUrl());
     assertEquals(agency.isExternal(), result.getEmbedded().getExternal());
     assertEquals(agency.getConsultingTypeId(), result.getEmbedded().getConsultingType());
+    assertEquals(agency.getAgencyLogo(), result.getEmbedded().getAgencyLogo());
     assertThat(result.getEmbedded().getCounsellingRelations()).containsOnly(AgencyAdminResponseDTO.CounsellingRelationsEnum.PARENTAL_COUNSELLING, AgencyAdminResponseDTO.CounsellingRelationsEnum.RELATIVE_COUNSELLING);
     assertEquals(String.valueOf(agency.getCreateDate()), result.getEmbedded().getCreateDate());
     assertEquals(String.valueOf(agency.getUpdateDate()), result.getEmbedded().getUpdateDate());

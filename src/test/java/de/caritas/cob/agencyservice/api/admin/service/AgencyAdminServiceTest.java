@@ -18,6 +18,7 @@ import static org.mockito.Mockito.when;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import de.caritas.cob.agencyservice.api.admin.service.agency.AgencyTopicEnrichmentService;
+import de.caritas.cob.agencyservice.api.admin.service.agency.DataProtectionConverter;
 import de.caritas.cob.agencyservice.api.admin.service.agency.DemographicsConverter;
 import de.caritas.cob.agencyservice.api.admin.validation.DeleteAgencyValidator;
 import de.caritas.cob.agencyservice.api.exception.httpresponses.ConflictException;
@@ -25,15 +26,14 @@ import de.caritas.cob.agencyservice.api.exception.httpresponses.NotFoundExceptio
 import de.caritas.cob.agencyservice.api.model.AgencyAdminResponseDTO;
 import de.caritas.cob.agencyservice.api.model.AgencyTypeRequestDTO;
 import de.caritas.cob.agencyservice.api.model.DataProtectionContactDTO;
+import de.caritas.cob.agencyservice.api.model.DataProtectionDTO;
 import de.caritas.cob.agencyservice.api.model.DemographicsDTO;
 import de.caritas.cob.agencyservice.api.model.UpdateAgencyDTO;
 import de.caritas.cob.agencyservice.api.model.AgencyDTO;
 import de.caritas.cob.agencyservice.api.repository.agency.Agency;
-import de.caritas.cob.agencyservice.api.repository.agency.AgencyRepository;
 import de.caritas.cob.agencyservice.api.repository.agency.AgencyTenantUnawareRepository;
 import de.caritas.cob.agencyservice.api.repository.agency.DataProtectionResponsibleEntity;
 import de.caritas.cob.agencyservice.api.service.AppointmentService;
-import de.caritas.cob.agencyservice.api.service.LogService;
 import de.caritas.cob.agencyservice.api.util.JsonConverter;
 import java.util.List;
 import java.util.Optional;
@@ -75,6 +75,9 @@ class AgencyAdminServiceTest {
   DemographicsConverter demographicsConverter;
 
   @Mock
+  DataProtectionConverter dataProtectionConverter;
+
+  @Mock
   AppointmentService appointmentService;
 
   @Mock
@@ -104,23 +107,29 @@ class AgencyAdminServiceTest {
 
   @Test
   void createAgency_Should_CreateAgencyAndAddDefaultCounsellingRelations() {
+    // given
     var agency = this.easyRandom.nextObject(Agency.class);
     agency.setCounsellingRelations(null);
     agency.setDataProtectionOfficerContactData(null);
-    agency.setDataProtectionResponsibleEntity(null);
+    clearDataProtection(agency);
     var agencyDTO = this.easyRandom.nextObject(AgencyDTO.class);
     agencyDTO.setCounsellingRelations(null);
     agencyDTO.setConsultingType(1);
+    agencyDTO.setDataProtection(new DataProtectionDTO());
 
     when(agencyRepository.save(any())).thenReturn(agency);
+    // when
     agencyAdminService.createAgency(agencyDTO);
+    // then
     verify(agencyRepository).save(agencyArgumentCaptor.capture());
     assertThat(agencyArgumentCaptor.getValue().getCounsellingRelations(), is("RELATIVE_COUNSELLING,SELF_COUNSELLING,PARENTAL_COUNSELLING"));
+    verify(dataProtectionConverter).convertToEntity(Mockito.any(DataProtectionDTO.class), Mockito.any(Agency.AgencyBuilder.class));
   }
 
   @Test
   void updateAgency_Should_SaveAgencyMandatoryChanges_WhenAgencyIsFound() {
     var agency = this.easyRandom.nextObject(Agency.class);
+    clearDataProtection(agency);
     DataProtectionContactDTO dataProtectionContactDTO = this.easyRandom.nextObject(DataProtectionContactDTO.class);
     agency.setDataProtectionOfficerContactData(JsonConverter.convertToJson(dataProtectionContactDTO));
     agency.setDataProtectionAlternativeContactData(null);
@@ -139,12 +148,21 @@ class AgencyAdminServiceTest {
     assertEquals(agency.getConsultingTypeId(), passedConsultingTypeId);
   }
 
+  private void clearDataProtection(Agency agency) {
+    agency.setDataProtectionResponsibleEntity(null);
+    agency.setDataProtectionAgencyResponsibleContactData(null);
+    agency.setDataProtectionAlternativeContactData(null);
+    agency.setDataProtectionOfficerContactData(null);
+  }
+
   @Test
   void updateAgency_Should_SaveOptionalAgencyChanges_WhenAgencyIsFound() {
     var agency = easyRandom.nextObject(Agency.class);
     agency.setCounsellingRelations(AgencyAdminResponseDTO.CounsellingRelationsEnum.PARENTAL_COUNSELLING.getValue());
     agency.setDataProtectionResponsibleEntity(DataProtectionResponsibleEntity.ALTERNATIVE_REPRESENTATIVE);
     agency.setDataProtectionAlternativeContactData(JsonConverter.convertToJson(new DataProtectionContactDTO()));
+    agency.setDataProtectionOfficerContactData(null);
+    agency.setDataProtectionAgencyResponsibleContactData(null);
     when(agencyRepository.findById(AGENCY_ID)).thenReturn(Optional.of(agency));
     when(agencyRepository.save(any())).thenReturn(agency);
 
@@ -164,7 +182,7 @@ class AgencyAdminServiceTest {
     // given
     ReflectionTestUtils.setField(agencyAdminService, "featureTopicsEnabled", true);
     var agency = this.easyRandom.nextObject(Agency.class);
-    agency.setDataProtectionResponsibleEntity(null);
+    clearDataProtection(agency);
     agency.setCounsellingRelations(null);
     when(agencyRepository.findById(AGENCY_ID)).thenReturn(Optional.of(agency));
     when(agencyRepository.save(any())).thenReturn(agency);
@@ -185,6 +203,7 @@ class AgencyAdminServiceTest {
     // given
     ReflectionTestUtils.setField(agencyAdminService, "featureDemographicsEnabled", true);
     var agency = this.easyRandom.nextObject(Agency.class);
+    clearDataProtection(agency);
     agency.setDataProtectionAgencyResponsibleContactData(null);
     agency.setDataProtectionResponsibleEntity(DataProtectionResponsibleEntity.AGENCY_RESPONSIBLE);
     agency.setCounsellingRelations(AgencyAdminResponseDTO.CounsellingRelationsEnum.PARENTAL_COUNSELLING.getValue());
