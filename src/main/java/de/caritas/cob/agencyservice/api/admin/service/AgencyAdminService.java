@@ -49,14 +49,13 @@ public class AgencyAdminService {
   private final @NonNull AgencyTopicMergeService agencyTopicMergeService;
   private final @NonNull AppointmentService appointmentService;
 
+  private final @NonNull DataProtectionConverter dataProtectionConverter;
   @Autowired(required = false)
   private AgencyTopicEnrichmentService agencyTopicEnrichmentService;
 
   @Autowired(required = false)
   private DemographicsConverter demographicsConverter;
 
-  @Autowired
-  private DataProtectionConverter dataProtectionConverter;
 
   @Value("${feature.topics.enabled}")
   private boolean featureTopicsEnabled;
@@ -141,13 +140,15 @@ public class AgencyAdminService {
         .url(agencyDTO.getUrl())
         .isExternal(agencyDTO.getExternal())
         .counsellingRelations(Joiner.on(",").join(agencyDTO.getCounsellingRelations()))
+        .agencyLogo(agencyDTO.getAgencyLogo())
         .createDate(LocalDateTime.now(ZoneOffset.UTC))
         .updateDate(LocalDateTime.now(ZoneOffset.UTC));
+
 
     if (featureDemographicsEnabled && agencyDTO.getDemographics() != null) {
       demographicsConverter.convertToEntity(agencyDTO.getDemographics(), agencyBuilder);
     }
-
+    dataProtectionConverter.convertToEntity(agencyDTO.getDataProtection(), agencyBuilder);
     var agencyToCreate = agencyBuilder.build();
 
     if (featureTopicsEnabled) {
@@ -208,11 +209,10 @@ public class AgencyAdminService {
         .createDate(agency.getCreateDate())
         .updateDate(LocalDateTime.now(ZoneOffset.UTC))
         .counsellingRelations(agency.getCounsellingRelations())
-        .deleteDate(agency.getDeleteDate());
+        .deleteDate(agency.getDeleteDate())
+        .agencyLogo(updateAgencyDTO.getAgencyLogo());
 
-    if (dataProtectionConverter != null) {
-      dataProtectionConverter.convertToEntity(updateAgencyDTO.getDataProtection(), agencyBuilder);
-    }
+    dataProtectionConverter.convertToEntity(updateAgencyDTO.getDataProtection(), agencyBuilder);
 
     if (nonNull(updateAgencyDTO.getConsultingType())) {
       agencyBuilder.consultingTypeId(updateAgencyDTO.getConsultingType());
