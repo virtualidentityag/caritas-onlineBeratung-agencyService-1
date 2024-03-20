@@ -524,6 +524,9 @@ components:
         dataProtection:
           type: object
           $ref: '#/components/schemas/DataProtectionDTO'
+        agencyLogo:
+          type: string
+          example: "base64 encoded image"
 
     DataProtectionDTO:
         type: object
@@ -630,6 +633,12 @@ components:
           items:
             type: string
             enum: [ RELATIVE_COUNSELLING, SELF_COUNSELLING, PARENTAL_COUNSELLING]
+        dataProtection:
+          type: object
+          $ref: '#/components/schemas/DataProtectionDTO'
+        agencyLogo:
+          type: string
+          example: "base64 encoded image"
 
     AgencyAdminFullResponseDTO:
       type: object
@@ -693,6 +702,9 @@ components:
         dataProtection:
           type: object
           $ref: '#/components/schemas/DataProtectionDTO'
+        agencyLogo:
+          type: string
+          example: "base64 encoded image"
 
     DemographicsDTO:
       type: object
