@@ -26,6 +26,4 @@ class TopicServiceTest {
     // then
     verify(topicCachingService).getAllTopics(TenantContext.getCurrentTenant());
   }
-
-
 }
