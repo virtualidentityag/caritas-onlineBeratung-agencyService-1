@@ -1,6 +1,5 @@
 package de.caritas.cob.agencyservice.api.service;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 
 import de.caritas.cob.agencyservice.api.tenant.TenantContext;
