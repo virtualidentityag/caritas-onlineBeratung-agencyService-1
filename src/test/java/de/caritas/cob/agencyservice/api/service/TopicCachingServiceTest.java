@@ -1,6 +1,7 @@
 package de.caritas.cob.agencyservice.api.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
@@ -52,7 +53,7 @@ class TopicCachingServiceTest {
     topicCachingService.getAllTopics(1L);
 
     // then
-    assertEquals(expectedTopics, actualTopics);
+    assertThat(actualTopics).isEqualTo(expectedTopics);
     Mockito.verify(topicControllerApi, Mockito.times(1)).getAllTopics();
   }
 }
