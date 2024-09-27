@@ -6,6 +6,7 @@ on:
       - "develop"
       - "staging"
       - "release"
+
 jobs:
   test:
     name: Build and run unit tests
