@@ -34,6 +34,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for agencies.
@@ -75,6 +76,7 @@ public class AgencyService {
    * @param agencyIds the ids of requested agencies
    * @return a list containing regarding agencies
    */
+  @Transactional
   public List<AgencyResponseDTO> getAgencies(List<Long> agencyIds) {
     return getAgencyRepositoryForSearch().findByIdIn(agencyIds).stream()
         .map(this::convertToAgencyResponseDTO)
@@ -98,7 +100,7 @@ public class AgencyService {
 
     } catch (MissingConsultingTypeException ex) {
       throw new BadRequestException(
-          String.format("Consulting type with id %s does not exist", consultingTypeId));
+          "Consulting type with id %s does not exist".formatted(consultingTypeId));
     }
   }
 
@@ -190,7 +192,7 @@ public class AgencyService {
   }
 
   private void assertTopicIdIsProvided(Optional<Integer> topicId) {
-    if (!topicId.isPresent()) {
+    if (topicId.isEmpty()) {
       throw new BadRequestException("Topic id not provided in the search");
     }
   }
@@ -261,10 +263,10 @@ public class AgencyService {
   }
 
   private void assertAgeAndGenderAreProvided(Optional<Integer> age, Optional<String> gender) {
-    if (!age.isPresent()) {
+    if (age.isEmpty()) {
       throw new BadRequestException("Age not provided in the search");
     }
-    if (!gender.isPresent()) {
+    if (gender.isEmpty()) {
       throw new BadRequestException("Age not provided in the search");
     }
   }
@@ -311,8 +313,12 @@ public class AgencyService {
         .tenantId(agency.getTenantId())
         .consultingType(agency.getConsultingTypeId())
         .agencySpecificPrivacy(renderedAgencySpecificPrivacy)
-        .topicIds(agency.getAgencyTopics().stream().map(AgencyTopic::getTopicId).toList())
+        .topicIds(getAgencyTopics(agency).stream().map(AgencyTopic::getTopicId).toList())
         .agencyLogo(agency.getAgencyLogo());
+  }
+
+  private static List<AgencyTopic> getAgencyTopics(Agency agency) {
+    return agency.getAgencyTopics() == null ? Lists.newArrayList() : agency.getAgencyTopics();
   }
 
   protected String getRenderedAgencySpecificPrivacy(Agency agency) {
@@ -342,7 +348,7 @@ public class AgencyService {
         .external(agency.isExternal())
         .demographics(getDemographics(agency))
         .tenantId(agency.getTenantId())
-        .topicIds(agency.getAgencyTopics().stream().map(AgencyTopic::getTopicId).toList())
+        .topicIds(getAgencyTopics(agency).stream().map(AgencyTopic::getTopicId).toList())
         .agencyLogo(agency.getAgencyLogo());
 
   }

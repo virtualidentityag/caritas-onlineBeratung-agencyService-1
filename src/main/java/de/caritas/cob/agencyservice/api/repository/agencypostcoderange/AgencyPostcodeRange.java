@@ -38,7 +38,6 @@ import org.hibernate.annotations.ParamDef;
 @Getter
 @Setter
 @Builder
-@FilterDef(name = "tenantFilter", parameters = {@ParamDef(name = "tenantId", type = Long.class)})
 @Filter(name = "tenantFilter", condition = "tenant_id = :tenantId")
 public class AgencyPostcodeRange implements TenantAware {
 

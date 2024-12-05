@@ -5,14 +5,14 @@ import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
 import java.io.PrintWriter;
-import javax.ws.rs.BadRequestException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import jakarta.ws.rs.BadRequestException;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LogServiceTest {
 
   @Mock

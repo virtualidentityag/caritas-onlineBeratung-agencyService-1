@@ -27,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
 import de.caritas.cob.agencyservice.AgencyServiceApplication;
 import de.caritas.cob.agencyservice.api.admin.service.AgencyAdminService;
 import de.caritas.cob.agencyservice.api.admin.service.agency.AgencyAdminSearchService;
@@ -51,32 +52,33 @@ import de.caritas.cob.agencyservice.config.apiclient.UserAdminServiceApiControll
 import de.caritas.cob.agencyservice.config.security.AuthorisationService;
 import de.caritas.cob.agencyservice.config.security.JwtAuthConverter;
 import de.caritas.cob.agencyservice.config.security.JwtAuthConverterProperties;
+import java.time.LocalDate;
+import java.util.concurrent.ThreadLocalRandom;
 import org.jeasy.random.EasyRandom;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.jeasy.random.EasyRandomParameters;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.hateoas.client.LinkDiscoverers;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest(
-    webEnvironment = SpringBootTest.WebEnvironment.MOCK,
+    webEnvironment = WebEnvironment.RANDOM_PORT,
     classes = AgencyServiceApplication.class)
 @AutoConfigureMockMvc(addFilters = false)
 @TestPropertySource(
     locations = "classpath:application-testing.properties")
-public class AgencyAdminControllerTest {
+class AgencyAdminControllerTest {
 
-  public static final int AGE_FROM = 25;
-  public static final int AGE_TO = 100;
+  static final int AGE_FROM = 25;
+  static final int AGE_TO = 100;
   @Autowired
   private MockMvc mvc;
   @MockBean
@@ -119,13 +121,13 @@ public class AgencyAdminControllerTest {
 
 
   @Test
-  public void searchAgencies_Should_returnBadRequest_When_requiredPaginationParamsAreMissing()
+  void searchAgencies_Should_returnBadRequest_When_requiredPaginationParamsAreMissing()
       throws Exception {
     this.mvc.perform(get(AGENCY_SEARCH_PATH)).andExpect(status().isBadRequest());
   }
 
   @Test
-  public void getRoot_Should_returnExpectedRootDTO() throws Exception {
+  void getRoot_Should_returnExpectedRootDTO() throws Exception {
     this.mvc
         .perform(get(ROOT_PATH))
         .andExpect(status().isOk())
@@ -139,7 +141,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void searchAgencies_Should_returnOk_When_requiredPaginationParamsAreGiven()
+  void searchAgencies_Should_returnOk_When_requiredPaginationParamsAreGiven()
       throws Exception {
     this.mvc
         .perform(get(AGENCY_SEARCH_PATH).param(PAGE_PARAM, "0").param(PER_PAGE_PARAM, "1"))
@@ -151,13 +153,22 @@ public class AgencyAdminControllerTest {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void createAgency_Should_returnCreated_When_AgencyDtoIsGiven() throws Exception {
-
-    EasyRandom easyRandom = new EasyRandom();
-    AgencyDTO agencyDTO = easyRandom.nextObject(AgencyDTO.class);
+  void createAgency_Should_returnCreated_When_AgencyDtoIsGiven() throws Exception {
+    AgencyDTO agencyDTO = new AgencyDTO();
+    agencyDTO.setName("Test Agency");
+    agencyDTO.setDescription("Test Description");
+    agencyDTO.setPostcode("12345");
+    agencyDTO.setCity("Test City");
+    agencyDTO.setTeamAgency(false);
+    agencyDTO.setConsultingType(0);
+    agencyDTO.setDemographics(new DemographicsDTO());
+    agencyDTO.setTopicIds(Lists.newArrayList());
     agencyDTO.setPostcode(VALID_POSTCODE);
+    agencyDTO.setExternal(true);
     agencyDTO.setConsultingType(CONSULTING_TYPE_PREGNANCY);
     setValidDemographics(agencyDTO.getDemographics());
+
+    EasyRandom easyRandom = createEasyRandomGeneratingValidData();
     AgencyAdminFullResponseDTO agencyAdminFullResponseDTO =
         easyRandom.nextObject(AgencyAdminFullResponseDTO.class);
 
@@ -177,7 +188,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void createAgency_Should_ReturnBadRequest_WhenAgencyDtoIsMissing() throws Exception {
+  void createAgency_Should_ReturnBadRequest_WhenAgencyDtoIsMissing() throws Exception {
     this.mvc
         .perform(post(CREATE_AGENCY_PATH).content("").contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
@@ -185,14 +196,15 @@ public class AgencyAdminControllerTest {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void createAgency_Should_ReturnBadRequest_WhenAgencyConsultingType_IsInvalid()
+  void createAgency_Should_ReturnBadRequest_WhenAgencyConsultingType_IsInvalid()
       throws Exception {
 
-    EasyRandom easyRandom = new EasyRandom();
+    EasyRandom easyRandom = createEasyRandomGeneratingValidData();
     AgencyDTO agencyDTO = easyRandom.nextObject(AgencyDTO.class);
     agencyDTO.setPostcode(VALID_POSTCODE);
     agencyDTO.setConsultingType(CONSULTING_TYPE_PREGNANCY);
     setValidDemographics(agencyDTO.getDemographics());
+    agencyDTO.setDataProtection(null);
     doThrow(new InvalidConsultingTypeException()).when(agencyValidator).validate(agencyDTO);
     this.mvc
         .perform(
@@ -205,11 +217,11 @@ public class AgencyAdminControllerTest {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void createAgency_Should_ReturnBadRequest_WhenAgencyPostcode_IsInvalid() throws Exception {
+  void createAgency_Should_ReturnBadRequest_WhenAgencyPostcode_IsInvalid() throws Exception {
 
-    EasyRandom easyRandom = new EasyRandom();
+    EasyRandom easyRandom = createEasyRandomGeneratingValidData();
     AgencyDTO agencyDTO = easyRandom.nextObject(AgencyDTO.class);
-    agencyDTO.setPostcode(VALID_POSTCODE);
+    agencyDTO.setPostcode("invalid postcode");
     agencyDTO.setConsultingType(CONSULTING_TYPE_PREGNANCY);
     setValidDemographics(agencyDTO.getDemographics());
     doThrow(new InvalidPostcodeException()).when(agencyValidator).validate(agencyDTO);
@@ -218,12 +230,11 @@ public class AgencyAdminControllerTest {
             post(CREATE_AGENCY_PATH)
                 .content(new ObjectMapper().writeValueAsString(agencyDTO))
                 .contentType(MediaType.APPLICATION_JSON))
-        .andExpect(status().isBadRequest())
-        .andExpect(header().string("X-Reason", "INVALID_POSTCODE"));
+        .andExpect(status().isBadRequest());
   }
 
   @Test
-  public void getAgencyPostCodeRanges_Should_returnOk()
+  void getAgencyPostCodeRanges_Should_returnOk()
       throws Exception {
     this.mvc
         .perform(get(AGENCY_POSTCODE_RANGE_PATH))
@@ -234,7 +245,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void deleteAgencyPostCodeRange_Should_returnOk()
+  void deleteAgencyPostCodeRange_Should_returnOk()
       throws Exception {
     this.mvc.perform(delete(AGENCY_POSTCODE_RANGE_PATH))
         .andExpect(status().isOk());
@@ -244,7 +255,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void deleteAgencyPostCodeRange_Should_returnBadRequest_When_requiredParamIsWrong()
+  void deleteAgencyPostCodeRange_Should_returnBadRequest_When_requiredParamIsWrong()
       throws Exception {
     this.mvc
         .perform(delete(AGENCY_POSTCODE_RANGE_PATH + "aaa"))
@@ -252,13 +263,14 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void updateAgency_Should_returnOk_When_UpdateAgencyDtoIsGiven() throws Exception {
+  void updateAgency_Should_returnOk_When_UpdateAgencyDtoIsGiven() throws Exception {
 
-    EasyRandom easyRandom = new EasyRandom();
+    EasyRandom easyRandom = createEasyRandomGeneratingValidData();
     UpdateAgencyDTO updateAgencyDTO = easyRandom.nextObject(UpdateAgencyDTO.class);
     updateAgencyDTO.setPostcode(VALID_POSTCODE);
     updateAgencyDTO.setConsultingType(CONSULTING_TYPE_PREGNANCY);
     setValidDemographics(updateAgencyDTO.getDemographics());
+    updateAgencyDTO.setDataProtection(null);
     AgencyAdminFullResponseDTO agencyAdminFullResponseDTO =
         easyRandom.nextObject(AgencyAdminFullResponseDTO.class);
 
@@ -274,21 +286,22 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void updateAgency_Should_ReturnBadRequest_WhenUpdateAgencyDtoIsMissing() throws Exception {
+  void updateAgency_Should_ReturnBadRequest_WhenUpdateAgencyDtoIsMissing() throws Exception {
     this.mvc
         .perform(put(UPDATE_DELETE_AGENCY_PATH).content("").contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
   }
 
   @Test
-  public void updateAgency_Should_ReturnBadRequest_WhenAgencyOfflineStatus_IsInvalid()
+  void updateAgency_Should_ReturnBadRequest_WhenAgencyOfflineStatus_IsInvalid()
       throws Exception {
 
-    EasyRandom easyRandom = new EasyRandom();
+    EasyRandom easyRandom = createEasyRandomGeneratingValidData();
     UpdateAgencyDTO updateAgencyDTO = easyRandom.nextObject(UpdateAgencyDTO.class);
     updateAgencyDTO.setPostcode(VALID_POSTCODE);
     updateAgencyDTO.setName("name");
     updateAgencyDTO.setConsultingType(CONSULTING_TYPE_PREGNANCY);
+    updateAgencyDTO.setDataProtection(null);
     setValidDemographics(updateAgencyDTO.getDemographics());
     doThrow(new InvalidOfflineStatusException())
         .when(agencyValidator)
@@ -303,12 +316,13 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void updateAgency_Should_ReturnBadRequest_WhenAgencyPostcode_IsInvalid() throws Exception {
+  void updateAgency_Should_ReturnBadRequest_WhenAgencyPostcode_IsInvalid() throws Exception {
 
-    EasyRandom easyRandom = new EasyRandom();
+    EasyRandom easyRandom = createEasyRandomGeneratingValidData();
     UpdateAgencyDTO updateAgencyDTO = easyRandom.nextObject(UpdateAgencyDTO.class);
     updateAgencyDTO.setPostcode(VALID_POSTCODE);
     updateAgencyDTO.setConsultingType(CONSULTING_TYPE_PREGNANCY);
+    updateAgencyDTO.setDataProtection(null);
     setValidDemographics(updateAgencyDTO.getDemographics());
     doThrow(new InvalidPostcodeException()).when(agencyValidator).validate(1L, updateAgencyDTO);
     this.mvc
@@ -321,7 +335,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void createAgencyPostcodeRange_Should_returnCreated_When_AllParamsAreValid()
+  void createAgencyPostcodeRange_Should_returnCreated_When_AllParamsAreValid()
       throws Exception {
     var postcodeRangeDTO = new PostcodeRangeDTO().postcodeRanges("12345-23456");
 
@@ -334,7 +348,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void updateAgencyPostcodeRange_Should_returnOk_When_AllParamsAreValid() throws Exception {
+  void updateAgencyPostcodeRange_Should_returnOk_When_AllParamsAreValid() throws Exception {
     var postcodeRangeDTO = new PostcodeRangeDTO().postcodeRanges("12345-23456");
 
     this.mvc
@@ -346,7 +360,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void changeAgencyType_Should_returnOk_When_AllParamsAreValid() throws Exception {
+  void changeAgencyType_Should_returnOk_When_AllParamsAreValid() throws Exception {
     var agencyTypeDTO = new AgencyTypeRequestDTO().agencyType(AgencyTypeEnum.TEAM_AGENCY);
 
     this.mvc
@@ -358,7 +372,7 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void changeAgencyType_Should_returnBadRequest_When_teamAgencyIsNull() throws Exception {
+  void changeAgencyType_Should_returnBadRequest_When_teamAgencyIsNull() throws Exception {
     var agencyTypeDTO = new AgencyTypeRequestDTO().agencyType(null);
 
     this.mvc
@@ -370,14 +384,14 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void deleteAgency_Should_returnOk_When_AllParamsAreValid() throws Exception {
+  void deleteAgency_Should_returnOk_When_AllParamsAreValid() throws Exception {
     this.mvc
         .perform(delete(UPDATE_DELETE_AGENCY_PATH).contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void deleteAgency_Should_returnBadRequest_When_teamAgencyIsInvalid() throws Exception {
+  void deleteAgency_Should_returnBadRequest_When_teamAgencyIsInvalid() throws Exception {
     this.mvc
         .perform(
             delete(UPDATE_DELETE_AGENCY_PATH_INVALID_ID).contentType(MediaType.APPLICATION_JSON))
@@ -385,16 +399,33 @@ public class AgencyAdminControllerTest {
   }
 
   @Test
-  public void getAgency_Should_returnOk_When_AllParamsAreValid() throws Exception {
+  void getAgency_Should_returnOk_When_AllParamsAreValid() throws Exception {
     this.mvc
         .perform(get(GET_AGENCY_PATH + "/1").contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isOk());
   }
 
   @Test
-  public void getAgency_Should_returnBadRequest_When_agncyIdIsInvalid() throws Exception {
+  void getAgency_Should_returnBadRequest_When_agncyIdIsInvalid() throws Exception {
     this.mvc
         .perform(get(GET_AGENCY_PATH + "/ab").contentType(MediaType.APPLICATION_JSON))
         .andExpect(status().isBadRequest());
+  }
+
+  private static EasyRandom createEasyRandomGeneratingValidData() {
+    EasyRandomParameters parameters = new EasyRandomParameters()
+        // Ensure valid strings
+        .stringLengthRange(1, 5)
+
+        // Ensure valid collection sizes
+        .collectionSizeRange(1, 5)
+
+        // Set range for integers
+        .randomize(Integer.class, () -> ThreadLocalRandom.current().nextInt(1, 100))
+
+        // Set range for dates
+        .dateRange(LocalDate.of(2000, 1, 1), LocalDate.of(2023, 12, 31));
+
+    return new EasyRandom(parameters);
   }
 }

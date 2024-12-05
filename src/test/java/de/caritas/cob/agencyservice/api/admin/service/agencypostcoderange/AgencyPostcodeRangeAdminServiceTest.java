@@ -145,7 +145,7 @@ class AgencyPostcodeRangeAdminServiceTest {
         AgencyPostcodeRange.class));
 
     agencyPostcodeRangeAdminService.updatePostcodeRange(AGENCY_ID, postcodeRangeDTO);
-    ArgumentCaptor<Set<AgencyPostcodeRange>> captor = ArgumentCaptor.forClass((Class) List.class);
+    ArgumentCaptor<Set<AgencyPostcodeRange>> captor = ArgumentCaptor.forClass((Class) Set.class);
     verify(postcodeRangeValidator).validatePostcodeRanges(captor.capture());
     assertThat(captor.getValue(), not(hasItem(agencyPostCodeRange)));
   }
