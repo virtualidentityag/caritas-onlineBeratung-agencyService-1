@@ -14,7 +14,6 @@ import static de.caritas.cob.agencyservice.testHelper.TestConstants.VALID_POSTCO
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -35,8 +34,7 @@ import de.caritas.cob.agencyservice.api.model.PostcodeRangeDTO;
 import de.caritas.cob.agencyservice.api.model.UpdateAgencyDTO;
 import jakarta.servlet.http.Cookie;
 import org.jeasy.random.EasyRandom;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -47,15 +45,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-@RunWith(SpringRunner.class)
 @TestPropertySource(properties = "spring.profiles.active=testing")
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = Replace.ANY)
-public class AgencyAdminControllerAuthorizationIT {
+class AgencyAdminControllerAuthorizationIT {
 
   private static final String CSRF_HEADER = "csrfHeader";
   private static final String CSRF_VALUE = "test";
@@ -77,7 +73,7 @@ public class AgencyAdminControllerAuthorizationIT {
   private AgencyValidator agencyValidator;
 
   @Test
-  public void searchAgencies_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void searchAgencies_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(get(AGENCY_SEARCH_PATH)
@@ -89,8 +85,8 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void searchAgencies_Should_ReturnOkAndCallAgencyAdminSearchService_When_agencyAdminAuthority()
+  @WithMockUser(authorities = {"AUTHORIZATION_SEARCH_AGENCIES"})
+  void searchAgencies_Should_ReturnOkAndCallAgencyAdminSearchService_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(get(AGENCY_SEARCH_PATH)
@@ -104,7 +100,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void getAgencyPostCodeRanges_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void getAgencyPostCodeRanges_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(get(AGENCY_POSTCODE_RANGE_PATH)
@@ -117,7 +113,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void getAgencyPostCodeRanges_Should_ReturnOkAndCallAgencyPostCodeRangeAdminService_When_agencyAdminAuthority()
+  void getAgencyPostCodeRanges_Should_ReturnOkAndCallAgencyPostCodeRangeAdminService_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(get(AGENCY_POSTCODE_RANGE_PATH)
@@ -129,7 +125,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void createAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void createAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(post(CREATE_AGENCY_PATH)
@@ -144,7 +140,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void createAgency_Should_ReturnCreatedAndCallAgencyAdminServiceAndAgencyValidator_When_agencyAdminAuthority()
+  void createAgency_Should_ReturnCreatedAndCallAgencyAdminServiceAndAgencyValidator_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(post(CREATE_AGENCY_PATH)
@@ -159,7 +155,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void updateAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void updateAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(put(UPDATE_DELETE_AGENCY_PATH)
@@ -174,7 +170,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void updateAgency_Should_ReturnOkAndCallAgencyAdminServiceAndAgencyValidator_When_agencyAdminAuthority()
+  void updateAgency_Should_ReturnOkAndCallAgencyAdminServiceAndAgencyValidator_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(put(UPDATE_DELETE_AGENCY_PATH)
@@ -190,7 +186,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void deletePostcodeRange_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void deletePostcodeRange_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(delete(AGENCY_POSTCODE_RANGE_PATH)
@@ -204,7 +200,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void deletePostcodeRange_Should_ReturnOKAndCallAgencyAdminServiceAndAgencyValidator_When_agencyAdminAuthority()
+  void deletePostcodeRange_Should_ReturnOKAndCallAgencyAdminServiceAndAgencyValidator_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(delete(AGENCY_POSTCODE_RANGE_PATH + "1")
@@ -217,7 +213,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void createAgencyPostcodeRange_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void createAgencyPostcodeRange_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(post(AGENCY_POSTCODE_RANGE_PATH)
@@ -231,7 +227,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void createAgencyPostcodeRange_Should_ReturnCreatedAndCallAgencyPostCodeRangeAdminService_When_agencyAdminAuthority()
+  void createAgencyPostcodeRange_Should_ReturnCreatedAndCallAgencyPostCodeRangeAdminService_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(post(AGENCY_POSTCODE_RANGE_PATH)
@@ -246,7 +242,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void updateAgencyPostcodeRange_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void updateAgencyPostcodeRange_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(put(AGENCY_POSTCODE_RANGE_PATH)
@@ -260,7 +256,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void updateAgencyPostcodeRange_Should_ReturnOkAndCallAgencyPostCodeRangeAdminService_When_agencyAdminAuthority()
+  void updateAgencyPostcodeRange_Should_ReturnOkAndCallAgencyPostCodeRangeAdminService_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(put(AGENCY_POSTCODE_RANGE_PATH)
@@ -275,7 +271,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void changeAgencyType_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void changeAgencyType_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(post(CHANGE_AGENCY_TYPE_PATH)
@@ -289,7 +285,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void changeAgencyType_Should_ReturnOkAndCallAgencyAdminService_When_agencyAdminAuthority()
+  void changeAgencyType_Should_ReturnOkAndCallAgencyAdminService_When_agencyAdminAuthority()
       throws Exception {
     AgencyTypeRequestDTO requestDTO =
         new EasyRandom().nextObject(AgencyTypeRequestDTO.class);
@@ -305,7 +301,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void deleteAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void deleteAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(delete(UPDATE_DELETE_AGENCY_PATH)
@@ -319,7 +315,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void deleteAgency_Should_ReturnOkAndCallAgencyAdminService_When_agencyAdminAuthority()
+  void deleteAgency_Should_ReturnOkAndCallAgencyAdminService_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(delete(UPDATE_DELETE_AGENCY_PATH)
@@ -332,7 +328,7 @@ public class AgencyAdminControllerAuthorizationIT {
   }
 
   @Test
-  public void getAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
+  void getAgency_Should_ReturnUnauthorizedAndCallNoMethods_When_noKeycloakAuthorizationIsPresent()
       throws Exception {
 
     mvc.perform(get(GET_AGENCY_PATH + "/1")
@@ -346,7 +342,7 @@ public class AgencyAdminControllerAuthorizationIT {
 
   @Test
   @WithMockUser(authorities = {"AUTHORIZATION_AGENCY_ADMIN"})
-  public void getAgency_Should_ReturnOkAndCallAgencyAdminService_When_agencyAdminAuthority()
+  void getAgency_Should_ReturnOkAndCallAgencyAdminService_When_agencyAdminAuthority()
       throws Exception {
 
     mvc.perform(get(GET_AGENCY_PATH + "/1")

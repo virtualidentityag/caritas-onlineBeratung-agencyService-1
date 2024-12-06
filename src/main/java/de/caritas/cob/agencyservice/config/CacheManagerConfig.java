@@ -67,7 +67,7 @@ public class CacheManagerConfig {
   private long applicationSettingsTimeToLiveSeconds;
 
   @Bean(destroyMethod = "shutdown")
-  public net.sf.ehcache.CacheManager ehCacheManager() {
+  net.sf.ehcache.CacheManager ehCacheManager() {
     var config = new net.sf.ehcache.config.Configuration();
     config.addCache(buildConsultingTypeCacheConfiguration());
     config.addCache(buildTenantCacheConfiguration());
