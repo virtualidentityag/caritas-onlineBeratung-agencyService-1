@@ -16,7 +16,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.2.12</version>
+    <version>3.3.6</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
@@ -603,7 +603,7 @@
         <configuration>
           <exportDatatables>true</exportDatatables>
           <activeRecipes>
-            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_2</recipe>
+            <recipe>org.openrewrite.java.spring.boot3.UpgradeSpringBoot_3_3</recipe>
           </activeRecipes>
         </configuration>
         <dependencies>
