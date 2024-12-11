@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.caritas.cob.agencyservice.api.authorization.Authority.AuthorityValue;
 import java.util.List;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class AuthorityTest {
 

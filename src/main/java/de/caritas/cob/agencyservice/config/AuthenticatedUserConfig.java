@@ -34,7 +34,7 @@ public class AuthenticatedUserConfig {
    */
   @Bean
   @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.TARGET_CLASS)
-  public AuthenticatedUser getAuthenticatedUser() {
+  AuthenticatedUser getAuthenticatedUser() {
 
     JwtAuthenticationToken authenticationToken = (JwtAuthenticationToken) getRequest().getUserPrincipal();
 

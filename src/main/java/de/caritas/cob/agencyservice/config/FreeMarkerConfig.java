@@ -13,7 +13,7 @@ import org.springframework.ui.freemarker.FreeMarkerConfigurationFactoryBean;
 public class FreeMarkerConfig {
 
   @Bean
-  public freemarker.template.Configuration freemarkerConfiguration()
+  freemarker.template.Configuration freemarkerConfiguration()
       throws TemplateException, IOException {
     Configuration configuration = new FreeMarkerConfigurationFactoryBean().createConfiguration();
     configuration.setTemplateExceptionHandler(

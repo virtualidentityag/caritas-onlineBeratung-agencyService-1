@@ -4,8 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.google.common.collect.Lists;
 import de.caritas.cob.agencyservice.api.model.AgencyAdminFullResponseDTO;
@@ -61,26 +61,22 @@ public class AgencyAdminServiceITBase {
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getDelete().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/agencies/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/agencies/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
     assertThat(agencyAdminFullResponseDTO.getLinks().getSelf(), notNullValue());
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getSelf().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/agencies/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/agencies/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
     assertThat(agencyAdminFullResponseDTO.getLinks().getUpdate(), notNullValue());
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getUpdate().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/agencies/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/agencies/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
     assertThat(agencyAdminFullResponseDTO.getLinks().getPostcodeRanges(), notNullValue());
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getPostcodeRanges().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/postcoderanges/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/postcoderanges/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
   }
 
   protected AgencyDTO createAgencyDTO() {
@@ -142,26 +138,22 @@ public class AgencyAdminServiceITBase {
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getDelete().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/agencies/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/agencies/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
     assertThat(agencyAdminFullResponseDTO.getLinks().getSelf(), notNullValue());
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getSelf().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/agencies/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/agencies/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
     assertThat(agencyAdminFullResponseDTO.getLinks().getUpdate(), notNullValue());
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getUpdate().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/agencies/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/agencies/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
     assertThat(agencyAdminFullResponseDTO.getLinks().getPostcodeRanges(), notNullValue());
     assertThat(
         agencyAdminFullResponseDTO.getLinks().getPostcodeRanges().getHref(),
         endsWith(
-            String.format(
-                "/agencyadmin/postcoderanges/%s", agencyAdminFullResponseDTO.getEmbedded().getId())));
+            "/agencyadmin/postcoderanges/%s".formatted(agencyAdminFullResponseDTO.getEmbedded().getId())));
   }
 
   public void getAgency_Should_returnExpectedAgency_When_agencyWithIdExists() {

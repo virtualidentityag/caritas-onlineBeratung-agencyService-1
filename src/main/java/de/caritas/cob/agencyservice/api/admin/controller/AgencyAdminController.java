@@ -16,7 +16,7 @@ import de.caritas.cob.agencyservice.api.model.RootDTO;
 import de.caritas.cob.agencyservice.api.model.Sort;
 import de.caritas.cob.agencyservice.api.model.UpdateAgencyDTO;
 import de.caritas.cob.agencyservice.generated.api.admin.controller.AgencyadminApi;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Controller to handle all agency admin requests.
  */
 @RestController
-@Api(tags = "admin-agency-controller")
+@Tag(name = "admin-agency-controller")
 @RequiredArgsConstructor
 public class AgencyAdminController implements AgencyadminApi {
 
@@ -92,8 +92,6 @@ public class AgencyAdminController implements AgencyadminApi {
   @Override
   @PreAuthorize("hasAuthority('AUTHORIZATION_AGENCY_ADMIN')")
   public ResponseEntity<AgencyAdminFullResponseDTO> createAgency(@Valid AgencyDTO agencyDTO) {
-
-
     agencyValidator.validate(agencyDTO);
     var agencyAdminFullResponseDTO = agencyAdminService
         .createAgency(agencyDTO);

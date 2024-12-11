@@ -220,18 +220,22 @@ public class TestConstants {
       + "  \"external\": true\n"
       + "}";
 
-  public static final String VALID_AGENCY_UPDATE_DTO = "{\n"
-      + "  \"city\": \"City\",\n"
-      + "  \"description\": \"Description\",\n"
-      + "  \"name\": \"Agency\",\n"
-      + "  \"postcode\": \"76000\",\n"
-      + "  \"offline\": true,\n"
-      + "  \"external\": false\n"
-      + "}";
+  public static final String VALID_AGENCY_UPDATE_DTO = """
+      {
+        "city": "City",
+        "description": "Description",
+        "name": "Agency",
+        "postcode": "76000",
+        "offline": true,
+        "external": false
+      }\
+      """;
 
-  public static final String VALID_POSTCODE_RANGE_DTO = "{\n"
-      + "  \"postcodeFrom\": \"51107\",\n"
-      + "  \"postcodeTo\": \"51109\"\n"
-      + "}";
+  public static final String VALID_POSTCODE_RANGE_DTO = """
+      {
+        "postcodeFrom": "51107",
+        "postcodeTo": "51109"
+      }\
+      """;
 
 }

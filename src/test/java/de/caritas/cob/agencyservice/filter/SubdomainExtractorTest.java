@@ -4,7 +4,6 @@ package de.caritas.cob.agencyservice.filter;
 import static java.util.Collections.enumeration;
 import static java.util.Optional.of;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
-import static org.mockito.Mockito.when;
 
 import com.google.common.collect.Lists;
 import java.net.URISyntaxException;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)

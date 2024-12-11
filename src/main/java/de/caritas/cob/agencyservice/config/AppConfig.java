@@ -19,7 +19,7 @@ public class AppConfig {
    * Activate the messages.properties for validation messages
    */
   @Bean
-  public LocalValidatorFactoryBean validator(MessageSource messageSource) {
+  LocalValidatorFactoryBean validator(MessageSource messageSource) {
     LocalValidatorFactoryBean validatorFactoryBean = new LocalValidatorFactoryBean();
     validatorFactoryBean.setValidationMessageSource(messageSource);
     return validatorFactoryBean;

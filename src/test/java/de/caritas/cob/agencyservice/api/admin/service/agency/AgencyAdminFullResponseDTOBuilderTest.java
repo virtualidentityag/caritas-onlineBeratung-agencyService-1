@@ -116,16 +116,16 @@ class AgencyAdminFullResponseDTOBuilderTest {
     assertEquals(TENANT_ID, result.getEmbedded().getTenantId());
     assertThat(agencyLinks.getSelf()).isNotNull();
     assertThat(agencyLinks.getSelf().getMethod()).isEqualTo(MethodEnum.GET);
-    assertThat(agencyLinks.getSelf().getHref()).isEqualTo(String.format("/agencyadmin/agencies/%s", agency.getId()));
+    assertThat(agencyLinks.getSelf().getHref()).isEqualTo("/agencyadmin/agencies/%s".formatted(agency.getId()));
     assertThat(agencyLinks.getDelete()).isNotNull();
     assertThat(agencyLinks.getDelete().getMethod()).isEqualTo(MethodEnum.DELETE);
-    assertThat(agencyLinks.getDelete().getHref()).isEqualTo(String.format("/agencyadmin/agencies/%s", agency.getId()));
+    assertThat(agencyLinks.getDelete().getHref()).isEqualTo("/agencyadmin/agencies/%s".formatted(agency.getId()));
     assertThat(agencyLinks.getUpdate()).isNotNull();
     assertThat(agencyLinks.getUpdate().getMethod()).isEqualTo(MethodEnum.PUT);
-    assertThat(agencyLinks.getUpdate().getHref()).isEqualTo(String.format("/agencyadmin/agencies/%s", agency.getId()));
+    assertThat(agencyLinks.getUpdate().getHref()).isEqualTo("/agencyadmin/agencies/%s".formatted(agency.getId()));
     assertThat(agencyLinks.getPostcodeRanges()).isNotNull();
     assertThat(agencyLinks.getPostcodeRanges().getMethod()).isEqualTo(MethodEnum.GET);
-    assertThat(agencyLinks.getPostcodeRanges().getHref()).isEqualTo(String.format("/agencyadmin/postcoderanges/%s", this.agency.getId()));
+    assertThat(agencyLinks.getPostcodeRanges().getHref()).isEqualTo("/agencyadmin/postcoderanges/%s".formatted(this.agency.getId()));
   }
 
 }
